@@ -1,0 +1,157 @@
+# Docker container commands
+  1. docker container attach conatiner_name #attach local stdin and out to running conatiner 
+  or docker attach container_name
+  Example
+  [node1 ~]$ docker run --name nginx -dt nginx
+d1a4ac0e17a16ac09b4c6538254cc067498cab4ae2330fcacd0710d456dd8d9d
+  [node1 ~]$ docker attach nginx
+2024/04/18 13:32:54 [notice] 35#35: signal 28 (SIGWINCH) received
+2024/04/18 13:32:54 [notice] 30#30: signal 28 (SIGWINCH) received
+
+______________________________________________________________________________
+2. Create a image from running container
+  docker container commit running_conatiner_hash or name_of_conatiner
+  or docker commit running_conatiner_hash or name_of_conatiner
+  [node1 ~]$ docker commit nginx nginx_1
+sha256:00fba3e66e9206208795c73b8c599cc8e875c81d8a917fc15e40a7a3a5aee858
+
+  
+__________________________________________
+  3. Copy a file from filesystem to docker image
+  Copy file from local filesystem to conatiner
+  docker cp path_to_file conatiner_name:/path_to_conatiner
+    [node1 ~]$ docker cp app.tar nginx:/usr/var
+Successfully copied 1.54kB to nginx:/usr/var
+
+  Copy a file form conatiner to local file system
+  docker cp conatiner_name:/path_to_conatiner_file path_to_local_filesystem
+  docker cp nginx:/usr /root/ravi
+Successfully copied 183MB to /root/ravi
+__________________________________________________________________________
+
+4.Create a new conatiner without starting it
+    docker create image_name new_conatiner_name
+    node1 ravi]$ docker create d12 new_conatiner
+9dc5b2d3615e1a4be83edc3a61f837094b365c438582d833dd86c571de170e41
+    You can start conatiner by later with below command
+    docker container start new_conatiner_name
+________________________________________________________________________
+    5. Check file and directory changed in conatiner since it started
+    docker container diff conatiner_name or hash
+    [node1 ravi]$ docker diff d1a
+C /run
+A /run/nginx.pid
+C /var
+C /var/cache
+C /var/cache/nginx
+
+    A - Means file or directory added
+    C - Means file or directory changed
+    D- Means file or directory delete
+__________________________________________________________________
+  6. Run a command inside docker or log into a conainer
+    docker exec -ti conatiner_name # to go inside container file system
+  docker exec conatiner_name ls -ltr #run a command inside conatiner
+    node1 ravi]$ docker exec -it  nginx ls -ltr
+total 4
+dr-xr-xr-x  13 root root    0 Aug 10  2023 sys
+drwxr-xr-x   2 root root    6 Jan 28 21:20 home
+drwxr-xr-x   2 root root    6 Jan 28 21:20 boot
+
+____________________________________________________________
+  7. Export a container file system as a tar file
+    docker export conatiner_name > name.tar
+    node1 ravi]$ docker export nginx > nginx1.tar
+[node1 ravi]$ ls
+app.tar  games    lib    libexec  nginx1.tar  share  var
+
+________________________________________________________________
+8. Display detailed information about one or more conatiners
+  docker inspect conatiner_names
+   [ node1 ravi]$ docker inspect nginx nginx2
+[
+    {
+        "Id": "d1a4ac0e17a16ac09b4c6538254cc067498cab4ae2330fcacd0710d456dd8d9d",
+        "Created": "2024-04-18T13:31:50.781573965Z",
+        "Path": "/docker-entrypoint.sh",
+________________________________________________________________
+9. Kill one more running containers
+  [node1 ~]$ docker kill nginx2
+nginx2
+_____________________________________________________________
+10. Check logs of a running conatiner 
+  [node1 ~]$ docker logs nginx -f       
+/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+
+  use -f to follow logs and --details for deatied logs.
+__________________________________________________
+11. List conatiners
+  docker conatiner ls 
+  use -a for all conatiner
+  use -s for show size of conatiner
+  use -n for number of conatiner
+  use -l for latest created containers
+___________________________________________________________
+12. Pause and unpause all the process running inside a conatiner
+  [node1 ~]$ docker container pause nginx
+nginx
+[node1 ~]$ docker container unpause nginx
+nginx
+____________________________________________________
+13. To conatiner port mappings
+  [node1 ~]$ docker port nginx_port1
+80/tcp -> 0.0.0.0:80
+
+____________________________________
+  14. remove all stooped and tangling (dont have any tag) containers
+  docker prune 
+  [node1 ~]$ docker container prune 
+WARNING! This will remove all stopped containers.
+Are you sure you want to continue? [y/N] Y
+Deleted Containers:
+dc456a81d3622cbe0d58d0cd48f1e25883c03c1d2351cec56e5cec9aba52df6f
+a5f2abf722d0eccf3bce28e8d152205a5c75e2874030299295c7e791f6f7e0b0
+___________________________________________
+15. Rename a container 
+  docker rename old_conatiner new_conatiner
+  [node1 ~]$ docker rename nginx3 my3
+
+_______________________________________________
+16. Restart one or more conatiner
+  docker restart conatiner_name
+____________________________________________
+17. Remove one or more conatiner
+  docker rm conatiner_names
+_____________________________________________________
+18. Create and run a new conatiner
+  docker container run [OPTIONS] IMAGE [COMMAND] [ARG...]
+  docker run --name=nginx nginx
+____________________________________________________
+19. Start one or more stooped container
+  docker start conatiner_name
+__________________________________________________________
+20. Display conatiers live statistic
+  docker stats
+  CONTAINER ID   NAME          CPU %     MEM USAGE / LIMIT     MEM %     NET I/O   BLOCK I/O         PIDS
+7fbc3e87751b   nginx_port1   0.00%     10.44MiB / 31.42GiB   0.03%     0B / 0B   0B / 8.19kB       9
+c4a12e350ae3   my3           0.00%     10.81MiB / 31.42GiB   0.03%     0B / 0B   0B / 36.9kB       9
+d1a4ac0e17a1   nginx         0.00%     16.82MiB / 31.42GiB   0.05%     0B / 0B   5.51MB / 36.9kB   9
+_____________________________________________________________
+21. Stop one or more running container 
+  docker stop conatiner_name
+___________________________________________
+22.Dispaly the running process of a conatiner
+  isplay the running processes of a container
+[node1 ~]$ docker top nginx
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+root                30561               30539               0                   13:31               pts/0               00:00:00 
+___________________________________________________________
+23. Update the configurations of one or more conatiner
+  [node1 ~]$ docker update --cpu-shares 100 nginx
+______________________________________________________________
+24. Block until one or more containers stop, then print their exit codes
+  [node1 ~]$ docker wait my3   
+
+  
+  
